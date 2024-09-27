@@ -1,0 +1,824 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "ae49eed8",
+   "metadata": {
+    "papermill": {
+     "duration": 0.009954,
+     "end_time": "2024-09-27T06:36:34.415013",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:34.405059",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Load Packages"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "d920d34a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-27T06:36:34.432617Z",
+     "iopub.status.busy": "2024-09-27T06:36:34.431201Z",
+     "iopub.status.idle": "2024-09-27T06:36:37.723197Z",
+     "shell.execute_reply": "2024-09-27T06:36:37.721593Z"
+    },
+    "papermill": {
+     "duration": 3.303308,
+     "end_time": "2024-09-27T06:36:37.726206",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:34.422898",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import re\n",
+    "from nltk.tokenize import word_tokenize\n",
+    "from nltk.corpus import stopwords\n",
+    "from nltk.stem import PorterStemmer\n",
+    "from sklearn.datasets import fetch_20newsgroups"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b78117c1",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006367,
+     "end_time": "2024-09-27T06:36:37.739468",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:37.733101",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Load Data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "7cc6a8df",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2024-09-27T06:36:37.754895Z",
+     "iopub.status.busy": "2024-09-27T06:36:37.754278Z",
+     "iopub.status.idle": "2024-09-27T06:36:52.724183Z",
+     "shell.execute_reply": "2024-09-27T06:36:52.722947Z"
+    },
+    "papermill": {
+     "duration": 14.980996,
+     "end_time": "2024-09-27T06:36:52.727138",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:37.746142",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# Load the dataset\n",
+    "newsgroups = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "41c8dab4",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-27T06:36:52.742931Z",
+     "iopub.status.busy": "2024-09-27T06:36:52.742426Z",
+     "iopub.status.idle": "2024-09-27T06:36:52.805231Z",
+     "shell.execute_reply": "2024-09-27T06:36:52.803910Z"
+    },
+    "papermill": {
+     "duration": 0.073692,
+     "end_time": "2024-09-27T06:36:52.808046",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:52.734354",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Text</th>\n",
+       "      <th>Category</th>\n",
+       "      <th>Category Name</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>\\n\\nI am sure some bashers of Pens fans are pr...</td>\n",
+       "      <td>10</td>\n",
+       "      <td>rec.sport.hockey</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>My brother is in the market for a high-perform...</td>\n",
+       "      <td>3</td>\n",
+       "      <td>comp.sys.ibm.pc.hardware</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>\\n\\n\\n\\n\\tFinally you said what you dream abou...</td>\n",
+       "      <td>17</td>\n",
+       "      <td>talk.politics.mideast</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>\\nThink!\\n\\nIt's the SCSI card doing the DMA t...</td>\n",
+       "      <td>3</td>\n",
+       "      <td>comp.sys.ibm.pc.hardware</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1)    I have an old Jasmine drive which I cann...</td>\n",
+       "      <td>4</td>\n",
+       "      <td>comp.sys.mac.hardware</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18841</th>\n",
+       "      <td>DN&gt; From: nyeda@cnsvax.uwec.edu (David Nye)\\nD...</td>\n",
+       "      <td>13</td>\n",
+       "      <td>sci.med</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18842</th>\n",
+       "      <td>\\nNot in isolated ground recepticles (usually ...</td>\n",
+       "      <td>12</td>\n",
+       "      <td>sci.electronics</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18843</th>\n",
+       "      <td>I just installed a DX2-66 CPU in a clone mothe...</td>\n",
+       "      <td>3</td>\n",
+       "      <td>comp.sys.ibm.pc.hardware</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18844</th>\n",
+       "      <td>\\nWouldn't this require a hyper-sphere.  In 3-...</td>\n",
+       "      <td>1</td>\n",
+       "      <td>comp.graphics</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18845</th>\n",
+       "      <td>After a tip from Gary Crum (crum@fcom.cc.utah....</td>\n",
+       "      <td>7</td>\n",
+       "      <td>rec.autos</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>18846 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                                    Text  Category  \\\n",
+       "0      \\n\\nI am sure some bashers of Pens fans are pr...        10   \n",
+       "1      My brother is in the market for a high-perform...         3   \n",
+       "2      \\n\\n\\n\\n\\tFinally you said what you dream abou...        17   \n",
+       "3      \\nThink!\\n\\nIt's the SCSI card doing the DMA t...         3   \n",
+       "4      1)    I have an old Jasmine drive which I cann...         4   \n",
+       "...                                                  ...       ...   \n",
+       "18841  DN> From: nyeda@cnsvax.uwec.edu (David Nye)\\nD...        13   \n",
+       "18842  \\nNot in isolated ground recepticles (usually ...        12   \n",
+       "18843  I just installed a DX2-66 CPU in a clone mothe...         3   \n",
+       "18844  \\nWouldn't this require a hyper-sphere.  In 3-...         1   \n",
+       "18845  After a tip from Gary Crum (crum@fcom.cc.utah....         7   \n",
+       "\n",
+       "                  Category Name  \n",
+       "0              rec.sport.hockey  \n",
+       "1      comp.sys.ibm.pc.hardware  \n",
+       "2         talk.politics.mideast  \n",
+       "3      comp.sys.ibm.pc.hardware  \n",
+       "4         comp.sys.mac.hardware  \n",
+       "...                         ...  \n",
+       "18841                   sci.med  \n",
+       "18842           sci.electronics  \n",
+       "18843  comp.sys.ibm.pc.hardware  \n",
+       "18844             comp.graphics  \n",
+       "18845                 rec.autos  \n",
+       "\n",
+       "[18846 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.DataFrame({\n",
+    "    'Text': newsgroups.data,\n",
+    "    'Category': newsgroups.target\n",
+    "})\n",
+    "df['Category Name'] = df['Category'].apply(lambda x: newsgroups.target_names[x])\n",
+    "df"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "580ab4c3",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-27T05:51:55.488836Z",
+     "iopub.status.busy": "2024-09-27T05:51:55.488330Z",
+     "iopub.status.idle": "2024-09-27T05:51:55.494293Z",
+     "shell.execute_reply": "2024-09-27T05:51:55.492920Z",
+     "shell.execute_reply.started": "2024-09-27T05:51:55.488794Z"
+    },
+    "papermill": {
+     "duration": 0.007119,
+     "end_time": "2024-09-27T06:36:52.822936",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:52.815817",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Preprocessing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "3ac0c9e4",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-27T06:36:52.839682Z",
+     "iopub.status.busy": "2024-09-27T06:36:52.839200Z",
+     "iopub.status.idle": "2024-09-27T06:38:36.259952Z",
+     "shell.execute_reply": "2024-09-27T06:38:36.258467Z"
+    },
+    "papermill": {
+     "duration": 103.433135,
+     "end_time": "2024-09-27T06:38:36.263063",
+     "exception": false,
+     "start_time": "2024-09-27T06:36:52.829928",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# Lowercasing\n",
+    "df['Text'] = df['Text'].str.lower()\n",
+    "\n",
+    "# Remove Punctuation and special characters\n",
+    "df['Text'] = df['Text'].apply(lambda x: re.sub(r'[^a-zA-Z\\s]', '', x))\n",
+    "\n",
+    "# Tokenization\n",
+    "df['Tokens'] = df['Text'].apply(word_tokenize)\n",
+    "\n",
+    "# Removing Stopwords\n",
+    "stop_words = set(stopwords.words('english'))\n",
+    "df['Tokens'] = df['Tokens'].apply(lambda tokens: [word for word in tokens if word not in stop_words])\n",
+    "\n",
+    "# Stemming\n",
+    "stemmer = PorterStemmer()\n",
+    "df['Tokens'] = df['Tokens'].apply(lambda tokens: [stemmer.stem(token) for token in tokens])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "af7f844e",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-27T06:38:36.279270Z",
+     "iopub.status.busy": "2024-09-27T06:38:36.278816Z",
+     "iopub.status.idle": "2024-09-27T06:38:36.304810Z",
+     "shell.execute_reply": "2024-09-27T06:38:36.303429Z"
+    },
+    "papermill": {
+     "duration": 0.037193,
+     "end_time": "2024-09-27T06:38:36.307466",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:36.270273",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Text</th>\n",
+       "      <th>Category</th>\n",
+       "      <th>Category Name</th>\n",
+       "      <th>Tokens</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>\\n\\ni am sure some bashers of pens fans are pr...</td>\n",
+       "      <td>10</td>\n",
+       "      <td>rec.sport.hockey</td>\n",
+       "      <td>[sure, basher, pen, fan, pretti, confus, lack,...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>my brother is in the market for a highperforma...</td>\n",
+       "      <td>3</td>\n",
+       "      <td>comp.sys.ibm.pc.hardware</td>\n",
+       "      <td>[brother, market, highperform, video, card, su...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>\\n\\n\\n\\n\\tfinally you said what you dream abou...</td>\n",
+       "      <td>17</td>\n",
+       "      <td>talk.politics.mideast</td>\n",
+       "      <td>[final, said, dream, mediterranean, new, area,...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>\\nthink\\n\\nits the scsi card doing the dma tra...</td>\n",
+       "      <td>3</td>\n",
+       "      <td>comp.sys.ibm.pc.hardware</td>\n",
+       "      <td>[think, scsi, card, dma, transfer, disk, scsi,...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>i have an old jasmine drive which i cannot...</td>\n",
+       "      <td>4</td>\n",
+       "      <td>comp.sys.mac.hardware</td>\n",
+       "      <td>[old, jasmin, drive, use, new, system, underst...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18841</th>\n",
+       "      <td>dn from nyedacnsvaxuwecedu david nye\\ndn a neu...</td>\n",
+       "      <td>13</td>\n",
+       "      <td>sci.med</td>\n",
+       "      <td>[dn, nyedacnsvaxuwecedu, david, nye, dn, neuro...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18842</th>\n",
+       "      <td>\\nnot in isolated ground recepticles usually a...</td>\n",
+       "      <td>12</td>\n",
+       "      <td>sci.electronics</td>\n",
+       "      <td>[isol, ground, recepticl, usual, unusu, color,...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18843</th>\n",
+       "      <td>i just installed a dx cpu in a clone motherboa...</td>\n",
+       "      <td>3</td>\n",
+       "      <td>comp.sys.ibm.pc.hardware</td>\n",
+       "      <td>[instal, dx, cpu, clone, motherboard, tri, mou...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18844</th>\n",
+       "      <td>\\nwouldnt this require a hypersphere  in space...</td>\n",
+       "      <td>1</td>\n",
+       "      <td>comp.graphics</td>\n",
+       "      <td>[wouldnt, requir, hyperspher, space, point, sp...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18845</th>\n",
+       "      <td>after a tip from gary crum crumfcomccutahedu i...</td>\n",
+       "      <td>7</td>\n",
+       "      <td>rec.autos</td>\n",
+       "      <td>[tip, gari, crum, crumfcomccutahedu, got, phon...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>18846 rows × 4 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                                    Text  Category  \\\n",
+       "0      \\n\\ni am sure some bashers of pens fans are pr...        10   \n",
+       "1      my brother is in the market for a highperforma...         3   \n",
+       "2      \\n\\n\\n\\n\\tfinally you said what you dream abou...        17   \n",
+       "3      \\nthink\\n\\nits the scsi card doing the dma tra...         3   \n",
+       "4          i have an old jasmine drive which i cannot...         4   \n",
+       "...                                                  ...       ...   \n",
+       "18841  dn from nyedacnsvaxuwecedu david nye\\ndn a neu...        13   \n",
+       "18842  \\nnot in isolated ground recepticles usually a...        12   \n",
+       "18843  i just installed a dx cpu in a clone motherboa...         3   \n",
+       "18844  \\nwouldnt this require a hypersphere  in space...         1   \n",
+       "18845  after a tip from gary crum crumfcomccutahedu i...         7   \n",
+       "\n",
+       "                  Category Name  \\\n",
+       "0              rec.sport.hockey   \n",
+       "1      comp.sys.ibm.pc.hardware   \n",
+       "2         talk.politics.mideast   \n",
+       "3      comp.sys.ibm.pc.hardware   \n",
+       "4         comp.sys.mac.hardware   \n",
+       "...                         ...   \n",
+       "18841                   sci.med   \n",
+       "18842           sci.electronics   \n",
+       "18843  comp.sys.ibm.pc.hardware   \n",
+       "18844             comp.graphics   \n",
+       "18845                 rec.autos   \n",
+       "\n",
+       "                                                  Tokens  \n",
+       "0      [sure, basher, pen, fan, pretti, confus, lack,...  \n",
+       "1      [brother, market, highperform, video, card, su...  \n",
+       "2      [final, said, dream, mediterranean, new, area,...  \n",
+       "3      [think, scsi, card, dma, transfer, disk, scsi,...  \n",
+       "4      [old, jasmin, drive, use, new, system, underst...  \n",
+       "...                                                  ...  \n",
+       "18841  [dn, nyedacnsvaxuwecedu, david, nye, dn, neuro...  \n",
+       "18842  [isol, ground, recepticl, usual, unusu, color,...  \n",
+       "18843  [instal, dx, cpu, clone, motherboard, tri, mou...  \n",
+       "18844  [wouldnt, requir, hyperspher, space, point, sp...  \n",
+       "18845  [tip, gari, crum, crumfcomccutahedu, got, phon...  \n",
+       "\n",
+       "[18846 rows x 4 columns]"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "80d12a9e",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-27T06:38:36.325595Z",
+     "iopub.status.busy": "2024-09-27T06:38:36.325038Z",
+     "iopub.status.idle": "2024-09-27T06:38:38.425840Z",
+     "shell.execute_reply": "2024-09-27T06:38:38.424694Z"
+    },
+    "papermill": {
+     "duration": 2.112642,
+     "end_time": "2024-09-27T06:38:38.428673",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:36.316031",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "df.to_csv(\"/kaggle/working/processed_text\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1c4eb34a",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007037,
+     "end_time": "2024-09-27T06:38:38.443160",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.436123",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Effect of embeddings on the model performance"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3edca31c",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006941,
+     "end_time": "2024-09-27T06:38:38.457336",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.450395",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Examine how different embeddings trained on specialised domain affect model performance.**\n",
+    "\n",
+    "Using various embedding models:\n",
+    "1. Word2Vec (General)\n",
+    "2. GloVe (General)\n",
+    "3. FastText (Wiki, web crawl, news)\n",
+    "4. Google News Word2Vec (Google News dataset)\n",
+    "5. BERT (Contextual Embeddings)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f8b9e24f",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007063,
+     "end_time": "2024-09-27T06:38:38.471867",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.464804",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# LSTM vs CNN for Text Classification"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "98227d5d",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006926,
+     "end_time": "2024-09-27T06:38:38.486076",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.479150",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Compare the performances of LSTM vs CNN. LSTM capture long-range dependencies, may out perform CNN. CNNs could be more efficient if the corpus is shorter.**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c17a9bc0",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007027,
+     "end_time": "2024-09-27T06:38:38.500396",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.493369",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Bidirectional LSTM vs Unidirectional LSTM"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "733959f3",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006921,
+     "end_time": "2024-09-27T06:38:38.514497",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.507576",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Bidirectional LSTMs provide better context understanding and perform better than unidirectional LSTMs**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c2b3ac62",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006892,
+     "end_time": "2024-09-27T06:38:38.528643",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.521751",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Examine the effect of Dropout Rate on Model Generalization"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2bc65d58",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006889,
+     "end_time": "2024-09-27T06:38:38.542836",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.535947",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Train models with varying dropout rates and observe how the model performance is affected on test set. Dropout is typically used to prevent overfitting.**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e21b7ba5",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006962,
+     "end_time": "2024-09-27T06:38:38.556978",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.550016",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Compare effectivness of combining CNN and LSTM Architectures"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "56561b5f",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007077,
+     "end_time": "2024-09-27T06:38:38.571369",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.564292",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Hybrid CNN-LSTM architecture may outperform individual CNN/LSTM models**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "10a1c32c",
+   "metadata": {
+    "papermill": {
+     "duration": 0.00695,
+     "end_time": "2024-09-27T06:38:38.585600",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.578650",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Effect of Attention Mechanism on Model Performance"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "42cc5ddc",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006853,
+     "end_time": "2024-09-27T06:38:38.599694",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.592841",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Attention model might improve model performance espeically for longer sequences, by helping the model focus on important parts of the corpus.**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8d26738f",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007241,
+     "end_time": "2024-09-27T06:38:38.614384",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.607143",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Impact of Learning Rate Scheduling"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e47e43b4",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007064,
+     "end_time": "2024-09-27T06:38:38.629388",
+     "exception": false,
+     "start_time": "2024-09-27T06:38:38.622324",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "**Evaluate how learning rate scheduling impacts model performance compared to a constant learning rate**"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 1740,
+     "sourceId": 3025,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 30775,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.14"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 128.242557,
+   "end_time": "2024-09-27T06:38:39.560558",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2024-09-27T06:36:31.318001",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
