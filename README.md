@@ -29,18 +29,4 @@ The Long Short-Term Memory (LSTM) folder contains experiments that leverage recu
 #### **hybrid_cnn_lstm**
 This folder includes experiments combining CNN and LSTM architectures to leverage the strengths of both. CNNs extract local features, while LSTMs capture sequential dependencies, creating a robust hybrid model.
 
-### How to Use
-1. Clone the repository to your local machine.
-2. Navigate to the desired folder to review specific experiments.
-3. Run the scripts to reproduce results or modify them for further exploration.
-
-### Requirements
-- Python 3.x
-- TensorFlow / PyTorch
-- Necessary libraries: NumPy, Pandas, Matplotlib, Scikit-learn, etc.
-
-### Contributions
-Feel free to contribute to the project by adding new experiments, optimizing models, or exploring additional techniques.
-
-### Acknowledgments
-Special thanks to the developers and maintainers of the 20 Newsgroup Dataset for providing a valuable resource for text classification research.
+In addition, I have included our originial brainstorming document, Brainstorm.ipynb.
