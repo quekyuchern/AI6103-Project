@@ -1,47 +1,46 @@
-AI6103 Deep Learning Project
+# AI6103 Deep Learning Project
 
-20 Newsgroup Dataset
+## 20 Newsgroup Dataset
 
-Overview
+### Overview
+The **20 Newsgroup Dataset** is a collection of approximately 18,000 newsgroup documents, partitioned across 20 different newsgroups. It is widely used for text classification and clustering tasks, making it an ideal dataset for exploring deep learning architectures. Each document belongs to one of the 20 categories, ranging from technology to politics and sports.
 
-The 20 Newsgroup Dataset is a collection of approximately 18,000 newsgroup documents, partitioned across 20 different newsgroups. It is widely used for text classification and clustering tasks, making it an ideal dataset for exploring deep learning architectures. Each document belongs to one of the 20 categories, ranging from technology to politics and sports.
-
-Project Structure
-
+### Project Structure
 This project investigates various deep learning architectures for text classification using the 20 Newsgroup Dataset. Below is an overview of the folders and the experiments they contain:
 
-Attention
-
+#### **Attention**
 This folder contains experiments utilizing attention mechanisms to improve the model's ability to focus on important words or phrases in the text. These mechanisms help capture contextual information effectively for text classification.
 
-Baseline
-
+#### **Baseline**
 The baseline models serve as a reference point for comparison. These include simple models such as Logistic Regression or Multilayer Perceptrons (MLPs) without advanced architectural components like CNNs or LSTMs.
 
-CNN
-
+#### **CNN**
 This folder contains experiments that explore Convolutional Neural Networks (CNNs) for text classification. The models focus on extracting local features and patterns from the text data using convolutional layers.
 
-Embeddings
-
+#### **Embeddings**
 The embeddings folder includes experiments that test various word embedding techniques such as Word2Vec, GloVe, and pre-trained embeddings like BERT. The goal is to analyze the impact of different embeddings on model performance.
 
-ExploreHyperParameters
-
+#### **ExploreHyperParameters**
 This folder contains hyperparameter tuning experiments. It explores various combinations of learning rates, optimizers, dropout rates, and batch sizes to identify optimal configurations for the deep learning models.
 
-LSTM
-
+#### **LSTM**
 The Long Short-Term Memory (LSTM) folder contains experiments that leverage recurrent neural networks to capture sequential dependencies in the text data. It focuses on the temporal aspects of the dataset.
 
-hybrid_cnn_lstm
-
+#### **hybrid_cnn_lstm**
 This folder includes experiments combining CNN and LSTM architectures to leverage the strengths of both. CNNs extract local features, while LSTMs capture sequential dependencies, creating a robust hybrid model.
 
-How to Use
+### How to Use
+1. Clone the repository to your local machine.
+2. Navigate to the desired folder to review specific experiments.
+3. Run the scripts to reproduce results or modify them for further exploration.
 
-Clone the repository to your local machine.
+### Requirements
+- Python 3.x
+- TensorFlow / PyTorch
+- Necessary libraries: NumPy, Pandas, Matplotlib, Scikit-learn, etc.
 
-Navigate to the desired folder to review specific experiments.
+### Contributions
+Feel free to contribute to the project by adding new experiments, optimizing models, or exploring additional techniques.
 
-Run the scripts to reproduce results or modify them for further exploration.
+### Acknowledgments
+Special thanks to the developers and maintainers of the 20 Newsgroup Dataset for providing a valuable resource for text classification research.
